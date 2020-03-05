@@ -13,6 +13,7 @@ class RemoteBase{
         ]);
         $res = file_get_contents($path, false, $context);
         $obj = json_decode($res);
+
         return $obj->data ?? null;
     }
 }
