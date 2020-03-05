@@ -12,6 +12,7 @@ class Engine{
     private static $urlDirs = null;
     private $root;
     private $host;
+    private $locale;
 
     public function __construct(){
         try{
@@ -27,6 +28,11 @@ class Engine{
 
     public function host($host){
         $this->host = $host;
+        return $this;
+    }
+
+    public function locale($locale){
+        $this->locale = $locale;
         return $this;
     }
 
