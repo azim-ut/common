@@ -8,4 +8,4 @@ date_default_timezone_set("Europe/Tallinn");
 require_once(__DIR__ . "/Engine.php");
 require_once(__DIR__ . "/base/RemoteBase.php");
 define('HOST', "http://tukan/");
-define('SKEY', "855C7913C66E2D88AAE5D451E2081B19177FA3CD");
+define('SKEY', "C801A8B9E8D4AA8E8CA3C14EF65F74C039A180F03ECEF26F19640DA1C675650B");

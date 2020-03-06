@@ -13,10 +13,12 @@ class Engine{
     private $root;
     private $host;
     private $locale;
+    private $settings;
 
     public function __construct(){
         try{
             self::$urlDirs = self::initDirs();
+	        $this->settings = parse_ini_file(__DIR__ . '/app.ini');
         }catch(Exception $se){
             echo ExceptionUtils::printException($se);
         }
@@ -49,6 +51,13 @@ class Engine{
 
         return self::$instance;
     }
+
+	public function prop($name){
+		if(isset($this->settings[$name])){
+			return $this->settings[$name];
+		}
+		return null;
+	}
 
     public static function getDir($i){
         if(!self::$urlDirs){
