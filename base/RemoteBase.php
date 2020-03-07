@@ -6,6 +6,8 @@ use core\exception\BadResultException;
 
 class RemoteBase{
     protected static function src($path, $method = "GET", $trace = false){
+        $host = Engine::getInstance()->prop("engine.host");
+
 	    $contextData  = [
 		    "http" => [
 			    "method" => $method,
@@ -13,6 +15,7 @@ class RemoteBase{
 		    ]
 	    ];
 	    $context = stream_context_create($contextData);
+        $path = $host.$path;
 	    $res = file_get_contents($path, false, $context);
 	    if($trace){
 		    var_dump($path, $contextData, $res);
