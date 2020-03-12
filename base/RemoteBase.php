@@ -11,7 +11,9 @@ class RemoteBase{
 	    $contextData  = [
 		    "http" => [
 			    "method" => $method,
-			    "header" => 'Cookie: ' . $_SERVER['HTTP_COOKIE']."\r\n"." skey:".Engine::getInstance()->prop("engine.skey")
+			    "header" => 'Cookie: ' . $_SERVER['HTTP_COOKIE']."\r\n".
+                            "skey:".Engine::getInstance()->prop("engine.skey")."\r\n".
+                            "User-Agent:".$_SERVER['HTTP_USER_AGENT']."\r\n"
 		    ]
 	    ];
 	    $context = stream_context_create($contextData);
