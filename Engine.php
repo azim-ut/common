@@ -2,10 +2,12 @@
 
 namespace core;
 
+use AppDto;
 use core\exception\CoreErrorException;
 use core\exception\SqlException;
 use core\utils\ExceptionUtils;
 use Exception;
+use RemoteBase;
 
 class Engine{
     protected static $instance = null;
@@ -22,6 +24,10 @@ class Engine{
         }catch(Exception $se){
             echo ExceptionUtils::printException($se);
         }
+    }
+
+    public function sessionId(){
+        return AppDto::getInstance()->sess();
     }
 
     public function builder(){
