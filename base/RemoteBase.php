@@ -34,11 +34,22 @@ class RemoteBase{
 
     private static function curlGet($to, $headers = array("Content-Type: application/x-www-form-urlencoded")){
         $curl = curl_init();
+
+        $cookie = array();
+        foreach( $_COOKIE as $key => $value ) {
+            $cookie[] = "{$key}={$value}";
+        };
+
+        $cookie = implode('; ', $cookie);
+
+        $curl_handle = curl_init();
+        curl_setopt($curl_handle, CURLOPT_COOKIE, $cookie);
+
         curl_setopt_array($curl, array(
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_VERBOSE        => true,
-            CURLOPT_COOKIE         => ($_SERVER['HTTP_COOKIE']??''),
+            CURLOPT_COOKIE         => $cookie,
             CURLOPT_URL            => $to
         ));
         $resp = curl_exec($curl);
