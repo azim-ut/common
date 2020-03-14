@@ -43,14 +43,24 @@ class RemoteBase{
         $cookie = implode('; ', $cookie);
 
         $curl_handle = curl_init();
-        curl_setopt($curl_handle, CURLOPT_COOKIE, $cookie);
+        curl_setopt($curl, CURLOPT_COOKIE, $cookie);
+
+
+        $headers = self::getHeadersList();
+
+//        curl_setopt($curl, CURLOPT_HTTPHEADER, "skey: ".Engine::getInstance()->prop("engine.skey"));
+        $headers[] = "skey: ".Engine::getInstance()->prop("engine.skey");
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
 
         curl_setopt_array($curl, array(
             CURLOPT_RETURNTRANSFER => 1,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_VERBOSE        => true,
-            CURLOPT_COOKIE         => $cookie,
-            CURLOPT_URL            => $to
+            CURLOPT_USERAGENT      => $_SERVER['HTTP_USER_AGENT'],
+            CURLOPT_URL            => $to,
+            CURLOPT_HTTPHEADER     => [
+                "skey: ".Engine::getInstance()->prop("engine.skey")
+            ],
         ));
         $resp = curl_exec($curl);
         if(!$resp){
@@ -59,5 +69,15 @@ class RemoteBase{
         curl_close($curl);
 
         return $resp;
+    }
+
+    private static function getHeadersList(){
+        $headers = [];
+        foreach ($_SERVER as $name => $value) {
+            if (substr($name, 0, 5) == 'HTTP_') {
+                $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+            }
+        }
+        return $headers;
     }
 }
