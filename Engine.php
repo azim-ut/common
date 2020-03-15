@@ -2,12 +2,11 @@
 
 namespace core;
 
-use AppDto;
+use ContextDto;
 use core\exception\CoreErrorException;
 use core\exception\SqlException;
 use core\utils\ExceptionUtils;
 use Exception;
-use RemoteBase;
 
 class Engine{
     protected static $instance = null;
@@ -19,15 +18,16 @@ class Engine{
 
     public function __construct(){
         try{
-            self::$urlDirs = self::initDirs();
-	        $this->settings = parse_ini_file(__DIR__ . '/app.ini');
+            self::$urlDirs  = self::initDirs();
+            $this->settings = parse_ini_file(__DIR__ . '/app.ini');
+            $this->root     = $this->prop("engine.template");
         }catch(Exception $se){
             echo ExceptionUtils::printException($se);
         }
     }
 
     public function sessionId(){
-        return AppDto::getInstance()->sess();
+        ContextDto::getInstance()->sess();
     }
 
     public function builder(){
@@ -36,16 +36,27 @@ class Engine{
 
     public function host($host){
         $this->host = $host;
+
         return $this;
     }
 
-    public function locale($locale){
-        $this->locale = $locale;
-        return $this;
+    public function getLocale(){
+        if($_COOKIE["locale"]??null){
+            return $_COOKIE["locale"];
+        }
+        return $this->prop("engine.locale");
+    }
+
+    public function setLocale($locale = null){
+
+        $expire = 3600 * 24 * 365;
+        setcookie("locale", $locale, time() + $expire, "/");
+        return $locale;
     }
 
     public function templateRoot($root){
         $this->root = $root;
+
         return $this;
     }
 
@@ -58,12 +69,13 @@ class Engine{
         return self::$instance;
     }
 
-	public function prop($name){
-		if(isset($this->settings[$name])){
-			return $this->settings[$name];
-		}
-		return null;
-	}
+    public function prop($name){
+        if(isset($this->settings[ $name ])){
+            return $this->settings[ $name ];
+        }
+
+        return null;
+    }
 
     public static function getDir($i){
         if(!self::$urlDirs){
@@ -106,40 +118,37 @@ class Engine{
         foreach(self::$urlDirs as $dir){
             $dirs[] = $dir;
         }
-        $templateFile = __DIR__ . "/../" . $this->root ?? "index.php";
-
-        while(sizeof($dirs)){
-            $checkDir = __DIR__ . "/../" . $this->root . implode("/", $dirs);
-            if(file_exists($checkDir . "/index.php")){
-                $templateFile = $checkDir . "/index.php";
-                break;
-            }else if(file_exists($checkDir . ".php")){
-                $templateFile = $checkDir . ".php";
-                break;
+        $templateRoot = __DIR__ . "/../" . $this->root;
+        $target       = null;
+        if(!empty($dirs)){
+            $checkDir = implode("/", $dirs);
+            if(file_exists($templateRoot.$checkDir . ".php")){
+                $target = $checkDir . ".php";
+            }
+            if(!$target && file_exists($templateRoot.$checkDir . "index.php")){
+                $target = $checkDir . "index.php";
             }
             array_pop($dirs);
         }
 
-        return $templateFile;
+        return $templateRoot . $target;
     }
 
     //---------------------------------------
     public function runProject(){
-        $templateFile = $this->getTemplateFile();
+        $path = $this->getTemplateFile();
         try{
-            if(false === ($data = @file_get_contents($templateFile))){
+            if(!$path){
                 http_response_code(404);
-                require_once($this->root . "errors/404.php");
-            }else if(empty($templateFile) || !file_exists($templateFile) || is_dir($templateFile)){
-                require_once($templateFile . "/index.php");
+                require_once(__DIR__ . "/" . $this->root . "/errors/404.php");
             }else{
-                require_once($templateFile);
+                require_once($path);
             }
         }catch(SqlException | CoreErrorException $se){
-            require_once(__DIR__ . "/../" . $this->root . "error/500.html");
+            require_once(__DIR__ . "/../" . $this->root . "errors/500.php");
             error_log(nl2br(ExceptionUtils::printException($se)));
         }catch(Exception $e){
-            require_once(__DIR__ . "/../" . $this->root . "error/500.html");
+            require_once(__DIR__ . "/../" . $this->root . "errors/500.php");
 
             return false;
             //echo $e->getFile() . " #" . $e->getLine() . "<br/>";
