@@ -133,7 +133,10 @@ class Engine{
 			array_pop($dirs);
 		}
 
-		return $templateRoot . $target;
+		if(file_exists($templateRoot . $target) && is_file($templateRoot . $target)){
+			return $templateRoot . $target;
+		}
+		return null;
 	}
 
 	//---------------------------------------
@@ -142,7 +145,10 @@ class Engine{
 		try{
 			if(!$path){
 				http_response_code(404);
-				require_once(__DIR__ . "/" . $this->root . "/errors/404.php");
+				if(file_exists(__DIR__ . "/" . $this->root . "errors/404.php")){
+					require_once __DIR__ . "/" . $this->root . "errors/404.php";
+				}
+				exit();
 			}else{
 				require_once($path);
 			}
