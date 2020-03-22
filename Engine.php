@@ -127,8 +127,8 @@ class Engine{
 			if(file_exists($templateRoot . $checkDir . ".php")){
 				$target = $checkDir . ".php";
 			}
-			if(!$target && file_exists($templateRoot . $checkDir . "index.php")){
-				$target = $checkDir . "index.php";
+			if(!$target && file_exists($templateRoot . $checkDir . "/index.php")){
+				$target = $checkDir . "/index.php";
 			}
 			array_pop($dirs);
 		}
