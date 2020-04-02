@@ -56,7 +56,7 @@ class RemoteBase{
             CURLOPT_HTTPHEADER     => [
                 "skey: " . Engine::getInstance()->prop("engine.skey"),
                 "sid: " . self::getLocalSessionId(),
-	            'Cookie: ' . $_SERVER['HTTP_COOKIE']."\r\n"
+	            'Cookie: ' . ($_SERVER['HTTP_COOKIE']??"")."\r\n"
             ],
         ));
         $resp = curl_exec($curl);
