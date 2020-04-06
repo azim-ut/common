@@ -38,7 +38,7 @@ class ContextDto extends RemoteBase{
 
     public function prop($name){
         if(!isset($this->data[ $name ])){
-            $this->data[ $name ] = self::getData("/core/rest/property/prop/string/" . $name);
+            $this->data[ $name ] = self::getData("/core/rest/context/prop/string/" . $name);
         }
 
         return $this->data[ $name ];
@@ -46,7 +46,7 @@ class ContextDto extends RemoteBase{
 
     public function propArray($name){
         if(!isset($this->data[ $name ])){
-            $this->data[ $name ] = self::getData("/core/rest/property/prop/array/" . $name);
+            $this->data[ $name ] = self::getData("/core/rest/context/prop/array/" . $name);
         }
 
         return $this->data[ $name ];
