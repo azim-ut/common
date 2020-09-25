@@ -41,6 +41,18 @@ class RemoteBase{
         return $_COOKIE["PHPSESSID"];
     }
 
+    private static function prepareHeaders(){
+	    $headers = [
+		    "skey: " . Engine::getInstance()->prop("engine.skey"),
+		    "sid: " . self::getLocalSessionId()
+	    ];
+	    if(isset($_SERVER['HTTP_COOKIE']) && !empty($_SERVER['HTTP_COOKIE'])){
+		    $headers[] = 'Cookie: ' . ($_SERVER['HTTP_COOKIE']??"")."\r\n";
+	    }
+	    return $headers;
+    }
+
+
     private static function curlPost($to, $params, $headers = array("Content-Type: application/x-www-form-urlencoded")){
         $curl = curl_init();
 
@@ -53,10 +65,7 @@ class RemoteBase{
             CURLOPT_VERBOSE        => true,
             CURLOPT_USERAGENT      => $_SERVER['HTTP_USER_AGENT'],
             CURLOPT_URL            => $to,
-            CURLOPT_HTTPHEADER     => [
-                "skey: " . Engine::getInstance()->prop("engine.skey"),
-                "sid: " . self::getLocalSessionId()
-            ],
+            CURLOPT_HTTPHEADER     => self::prepareHeaders()
         ));
         $resp = curl_exec($curl);
         if(!$resp){
@@ -77,10 +86,7 @@ class RemoteBase{
             CURLOPT_VERBOSE        => true,
             CURLOPT_USERAGENT      => $_SERVER['HTTP_USER_AGENT'],
             CURLOPT_URL            => $to,
-            CURLOPT_HTTPHEADER     => [
-                "skey: " . Engine::getInstance()->prop("engine.skey"),
-                "sid: " . self::getLocalSessionId()
-            ],
+            CURLOPT_HTTPHEADER     => self::prepareHeaders()
         ));
         $resp = curl_exec($curl);
         if(!$resp){
